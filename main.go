@@ -3,10 +3,17 @@ package main
 import (
 	"net/http"
 
+	"example.com/m/v2/controllers"
+	"example.com/m/v2/initializers"
 	"github.com/gin-gonic/gin"
 )
 
 var db = make(map[string]string)
+
+func init() {
+	initializers.LoadEnv()
+	initializers.Database()
+}
 
 func setupRouter() *gin.Engine {
 	// Disable Console Color
@@ -18,16 +25,19 @@ func setupRouter() *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
+	r.GET("/posts", controllers.PostsGet)
+	r.POST("/posts", controllers.PostsCreate)
+
 	// Get user value
-	r.GET("/user/:name", func(c *gin.Context) {
-		user := c.Params.ByName("name")
-		value, ok := db[user]
-		if ok {
-			c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
-		}
-	})
+	// r.GET("/user/:name", func(c *gin.Context) {
+	// 	user := c.Params.ByName("name")
+	// 	value, ok := db[user]
+	// 	if ok {
+	// 		c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
+	// 	} else {
+	// 		c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
+	// 	}
+	// })
 
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:
@@ -69,6 +79,7 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	r := setupRouter()
+
 	// Listen and Server in 0.0.0.0:8080
 	r.Run(":8080")
 }
