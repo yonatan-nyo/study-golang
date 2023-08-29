@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,11 +11,13 @@ func PostsGet(c *gin.Context) {
 }
 
 func PostsCreate(c *gin.Context) {
-	jsonData, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		fmt.Println(err)
+	var body struct {
+		Body  string
+		Title string
 	}
-	fmt.Println(jsonData)
+	c.Bind(&body)
 
-	c.JSON(200, gin.H{"data": jsonData})
+	fmt.Println(body)
+
+	c.JSON(200, gin.H{"data": body})
 }
